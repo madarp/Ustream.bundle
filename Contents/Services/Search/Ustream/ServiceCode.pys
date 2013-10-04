@@ -1,0 +1,31 @@
+BASE_URL = 'http://www.ustream.tv'
+AJAX_URL = 'http://www.ustream.tv/ajax/new/search.json?q=%s&type=live&location=anywhere'
+
+###############################################################################
+def Search(query):
+
+	oc = ObjectContainer(title1='Ustream', title2='Search Results', no_cache=True)
+	url = AJAX_URL % String.Quote(query)
+
+	json_obj = JSON.ObjectFromURL(url)
+	html = HTML.ElementFromString(json_obj['pageContent'])
+
+	for stream in html.xpath('//div[contains(@class, "media-item")]'):
+		url = stream.xpath('.//img/parent::a/@href')[0]
+		stream_title = stream.xpath('.//h4/a/text()')[0]
+		thumb = stream.xpath('.//img/@src')[0]
+
+		try:
+			summary = stream.xpath('.//span[@class="item-location"]/a/text()')[0]
+			summary = String.DecodeHTMLEntities(summary)
+		except:
+			summary = None
+
+		oc.add(VideoClipObject(
+			url = '%s/%s' % (BASE_URL, url.lstrip('/')),
+			title = stream_title,
+			summary = summary,
+			thumb = Resource.ContentsOfURLWithFallback(thumb)
+		))
+
+	return oc
