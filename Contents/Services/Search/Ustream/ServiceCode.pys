@@ -1,5 +1,5 @@
-BASE_URL = 'http://www.ustream.tv'
-AJAX_URL = 'http://www.ustream.tv/ajax/new/search.json?q=%s&type=live&location=anywhere'
+BASE_URL = 'https://www.ustream.tv'
+AJAX_URL = 'https://www.ustream.tv/ajax/search.json?q=%s&type=no-offline&location=anywhere'
 
 ###############################################################################
 def Search(query):
@@ -11,6 +11,7 @@ def Search(query):
 	html = HTML.ElementFromString(json_obj['pageContent'])
 
 	for stream in html.xpath('//div[contains(@class, "media-item")]'):
+
 		url = stream.xpath('.//img/parent::a/@href')[0]
 		stream_title = stream.xpath('.//h4/a/text()')[0]
 		thumb = stream.xpath('.//img/@src')[0]
